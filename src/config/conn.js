@@ -1,13 +1,20 @@
 import "dotenv/config";
-import mysql from "mysql2";
+import { Sequelize } from "sequelize";
 
-const conn = mysql.createPool({
-    connectionLimit: 10,
+const db_name = process.env.MYSQL_DATABASE
+const db_user = process.env.MYSQL_USER
+const db_pass = process.env.MYSQL_PASSWORD
+
+const conn = new Sequelize(db_name, db_user, db_pass, {
     host: process.env.MYSQL_HOST,
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    port: process.env.MYSQL_PORT,
-    database: process.env.MYSQL_DATABASE,
-});
+    dialect: "mysql"
+})
+
+try{
+    await conn.authenticate();
+    console.log("Connection MYSQL")
+}catch(error){
+    console.error("Error: ", error)
+}
 
 export default conn;
