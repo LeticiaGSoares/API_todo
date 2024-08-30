@@ -80,7 +80,7 @@ export const getTarefa = async (req, res) => {
 export const updateTarefa = async (req, res) => {
     const {tarefa_id} = req.params
     const {tarefa, descricao, status} = req.body
-
+    
     //Validações
     if (!tarefa) {
         return res.status(404).json({message: `A tarefa é obrigatória` });
@@ -91,21 +91,38 @@ export const updateTarefa = async (req, res) => {
     if (!status) {
         return res.status(404).json({message: `O status é obrigatório` });
     }
-
+    
     const updatedTarefa = {
         tarefa, 
         descricao, 
         status
     } 
-
+    
     try{
         const [linhasAfetadas] = await Tarefa.update(updatedTarefa, {where : {id: tarefa_id}})
         if(linhasAfetadas <= 0){ 
             return res.status(404).json({message: "Tarefa não encontrada"})
         }
-
+        
         res.status(200).json({message: "Tarefa atualizada"})
     }catch(error){
         res.status(500).json({message: "Erro interno do seridor" + error});
+    }
+}
+
+export const getTaskByStatus = async (req, res) => {
+    const {situacao} = req.params
+    
+    try{
+        const tarefa = await Tarefa.findAll({ where: { status: situacao}})
+
+        if (!tarefa) {
+            return res.status(404).json({message: `Tarefa com status ${situacao} não existe` });
+        } 
+
+        res.status(200).json({message: tarefa})
+
+    }catch(error){
+        res.status(500).json({message: "Erro interno do servidor" + error})
     }
 }
