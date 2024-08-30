@@ -76,7 +76,6 @@ export const getTarefa = async (req, res) => {
     }
 }
 
-
 export const updateTarefa = async (req, res) => {
     const {tarefa_id} = req.params
     const {tarefa, descricao, status} = req.body
@@ -99,6 +98,33 @@ export const updateTarefa = async (req, res) => {
     } 
 
     try{
+        const [linhasAfetadas] = await Tarefa.update(updatedTarefa, {where : {id: tarefa_id}})
+        if(linhasAfetadas <= 0){ 
+            return res.status(404).json({message: "Tarefa não encontrada"})
+        }
+
+        res.status(200).json({message: "Tarefa atualizada"})
+    }catch(error){
+        res.status(500).json({message: "Erro interno do seridor" + error});
+    }
+}
+
+export const updateStatus = async (req, res)=> {
+    const {tarefa_id} = req.params
+
+    try{
+        const tarefa = await Tarefa.findByPk(tarefa_id)
+
+        if (!tarefa) {
+            return res.status(404).json({message: `Tarefa ${tarefa_id} não existe` });
+        }
+        
+        const status = tarefa.dataValues.status === "pendente"? 2 : 1
+
+        const updatedTarefa = {
+            status
+        }
+
         const [linhasAfetadas] = await Tarefa.update(updatedTarefa, {where : {id: tarefa_id}})
         if(linhasAfetadas <= 0){ 
             return res.status(404).json({message: "Tarefa não encontrada"})
