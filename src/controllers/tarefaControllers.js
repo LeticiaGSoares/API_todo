@@ -15,14 +15,14 @@ const createSchema = z.object({
 export const create = async (req, res) => {
     const {tarefa, descricao} = req.body
     const bodyValidation = createSchema.safeParse(req.body)
-
-    const status = 1
     if(!bodyValidation.success){
-        return res.status(500).json({
+        return res.status(400).json({
             message: "Erro interno do servidor",
-            error: formatZodError
+            error: formatZodError(bodyValidation.error)
         })
     }
+
+    const status = 1
     const novaTarefa = {
         tarefa,
         descricao,
@@ -83,16 +83,13 @@ export const getTarefa = async (req, res) => {
 export const updateTarefa = async (req, res) => {
     const {tarefa_id} = req.params
     const {tarefa, descricao, status} = req.body
-    
-    //Validações
-    if (!tarefa) {
-        return res.status(404).json({message: `A tarefa é obrigatória` });
-    } 
-    if (!descricao) {
-        return res.status(404).json({message: `A descricao é obrigatória` });
-    } 
-    if (!status) {
-        return res.status(404).json({message: `O status é obrigatório` });
+
+    const bodyValidation = createSchema.safeParse(req.body)
+    if(!bodyValidation.success){
+        return res.status(500).json({
+            message: "Erro interno do servidor",
+            error: formatZodError(bodyValidation.error)
+        })
     }
     
     const updatedTarefa = {
