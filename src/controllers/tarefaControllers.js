@@ -12,6 +12,10 @@ const createSchema = z.object({
         .transform((txt)=> txt.toLowerCase())
 })
 
+const getSchema = z.object({
+    tarefa_id: z.string().uuid()
+})
+
 export const create = async (req, res) => {
     const {tarefa, descricao} = req.body
     const bodyValidation = createSchema.safeParse(req.body)
@@ -67,6 +71,15 @@ export const getAll = async (req, res) => {
 export const getTarefa = async (req, res) => {
     const {tarefa_id} = req.params
 
+    const paramsValidation = getSchema.safeParse(req.params)
+    if(!paramsValidation.success){
+        res.status(400).json({
+            message: "Id da tarefa é inválido",
+            error: paramsValidation.error
+        })
+        return
+    }
+
     try{
         const tarefa = await Tarefa.findByPk(tarefa_id)
 
@@ -112,6 +125,15 @@ export const updateTarefa = async (req, res) => {
 
 export const updateStatus = async (req, res)=> {
     const {tarefa_id} = req.params
+
+    const paramsValidation = getSchema.safeParse(req.params)
+    if(!paramsValidation.success){
+        res.status(400).json({
+            message: "Id da tarefa é inválido",
+            error: paramsValidation.error
+        })
+        return
+    }
 
     try{
         const tarefa = await Tarefa.findByPk(tarefa_id)
