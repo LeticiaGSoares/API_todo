@@ -21,7 +21,7 @@ const Tarefa = conn.define
     },
     status: {
         type: DataTypes.ENUM,
-        values: ["pendentes", "concluida"]
+        values: ["pendente", "concluida"]
     }
 }, {
     tableName: table_mysql,

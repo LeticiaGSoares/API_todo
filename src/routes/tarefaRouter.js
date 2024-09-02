@@ -8,6 +8,6 @@ router.post("/", create)
 router.get("/:tarefa_id", getTarefa)
 router.get("/status/:situacao", getTaskByStatus)
 router.put("/:tarefa_id", updateTarefa)
-router.put("/status/:tarefa_id", updateStatus)
+router.patch("/:tarefa_id/status", updateStatus)
 
 export default router;

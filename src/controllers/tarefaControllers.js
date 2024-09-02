@@ -1,24 +1,28 @@
 import Tarefa from "../models/tarefaModel.js"
+import {z} from "zod";
+import {formatZodError} from "../helpers/index.js"
 
-// export const getAll = async (req, res) => {
-//     try{
-//         const tarefas = await Tarefa.findAll()
-//         res.status(200).json(tarefas)
-//     } catch(error){
-//         res.status(500).json({message: "Erro ao listar tarefas"})
-//     }
-// }
+const createSchema = z.object({
+    tarefa: z
+        .string()
+        .min(3, {error: "A tarefa deve ter pelo menos 3 caracteres"})
+        .transform((txt)=> txt.toLowerCase()),
+    descricao: z
+        .string()
+        .transform((txt)=> txt.toLowerCase())
+})
+
 export const create = async (req, res) => {
     const {tarefa, descricao} = req.body
+    const bodyValidation = createSchema.safeParse(req.body)
+
     const status = 1
-
-    if(!tarefa){
-        res.status(400).json({validationError: "A tarefa é obrigatória"})
+    if(!bodyValidation.success){
+        return res.status(500).json({
+            message: "Erro interno do servidor",
+            error: formatZodError
+        })
     }
-    if(!descricao){
-        res.status(400).json({validationError: "A descricao é obrigatória"})
-    }
-
     const novaTarefa = {
         tarefa,
         descricao,
