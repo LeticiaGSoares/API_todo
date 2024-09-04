@@ -1,6 +1,7 @@
 import Tarefa from "../models/tarefaModel.js"
 import {z} from "zod";
 import {formatZodError} from "../helpers/index.js"
+import { text } from "express";
 
 const createSchema = z.object({
     tarefa: z
@@ -121,6 +122,21 @@ export const updateTarefa = async (req, res) => {
     }catch(error){
         res.status(500).json({message: "Erro interno do seridor" + error});
     }
+}
+
+const buscarTarefaSituacaoSchema = {
+    situacao: z.enum(["pendente", "concluida"])
+}
+
+const updateTarefaSchema = {
+    tarefa: z
+        .string()
+        .min(3, {message: "A tarefa deve ter pelo menos 3 caracteres"})
+        .transform((txt) => txt.toLowerCase()),
+    descricao: z
+        .string()
+        .min(5, {message: "A tarefa deve ter pelo menos 5 caracteres"}),
+    situacao: z.enum(["pendente","concluida"]),
 }
 
 export const updateStatus = async (req, res)=> {
